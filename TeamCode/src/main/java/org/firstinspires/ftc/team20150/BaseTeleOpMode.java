@@ -1,31 +1,8 @@
 package org.firstinspires.ftc.team20150;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import java.util.regex.Matcher;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.vision.VisionPortal;
-
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfInt;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
-import org.opencv.core.Point;
-import org.opencv.core.RotatedRect;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
 
 public class BaseTeleOpMode extends OpMode {
 
@@ -34,57 +11,8 @@ public class BaseTeleOpMode extends OpMode {
     protected DcMotor leftBackDrive = null;
     protected DcMotor rightFrontDrive = null;
     protected DcMotor rightBackDrive = null;
-    protected ElapsedTime runtime = new ElapsedTime();
     protected int sectorCount = 4;
-    //motors in the arm and slide 
-    /*
-    protected Servo wristServo = null;
-    protected Servo intakeServo = null;
-    protected DcMotor armMotor = null;
-    protected DcMotor slideMotor = null;
-    
-    protected Servo holdUpSlideServo = null;
-    protected double holdUpLocked = 0.5;
-    protected double holdUpUnlocked = 0.2;
-    
-    protected DigitalChannel slideSensor = null;
-    protected DigitalChannel uprightSensor = null;
-    
-    protected int armFix = 0;
-    
-    // arm limits
-    protected int armMinPosition = 0;  //reset on init
-    protected int armMaxPosition = 0;  //reset on init to min + armMaxOffset
-    protected int armTargetPosition = 0;
-    //slide limits
-    protected int slideMinPosition = 0;  //reset on init
-    protected int slideMaxPosition = 0;  //reset on init to min + slideMaxOffset
-    protected int slideTargetPosition = 0;
-    //Maxium offsets
-    protected int armMaxOffset = 800;
-    protected int slideMaxOffset = 500;
-    
-    public double getArmRange() {
-        
-        return Double.valueOf(armMaxPosition - armMinPosition);
-    }
 
-    protected ElapsedTime runtime = new ElapsedTime();
-    protected int sectorCount = 4;
-    
-    public boolean isDemoModeActive = false;
-    */
-    
-    
-     // Variable to store our instance of the AprilTag processor.
-     
-    private AprilTagProcessor aprilTag;
-
-    
-     // The variable to store our instance of the vision portal.
-     
-    private VisionPortal visionPortal;
-    
     public double calculateMse(Mat img1, Mat img2) {
         double diff = 0.0;
         final int width = img1.width();
@@ -113,59 +41,18 @@ public class BaseTeleOpMode extends OpMode {
      
     @Override
     public void init() {
-        String[] potentialStatus = new String[]{"Happy", "Sad", "IDK", ":)", "Canadian", "Weird", "Helpful"};
-        int randomStatus = (int)Math.floor(Math.random() * 6);
-        telemetry.addData("Status", potentialStatus[randomStatus]);
-
         //Initialize the hardware variables.
         //Initializing the wheels
         leftFrontDrive = hardwareMap.get(DcMotor.class,"FL");
         leftBackDrive = hardwareMap.get(DcMotor.class, "BL");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "FR");
         rightBackDrive = hardwareMap.get(DcMotor.class, "BR");
-        //Initializing the arm 
-        /*
-        slideMotor = hardwareMap.get(DcMotor.class, "SLIDE");
-        armMotor = hardwareMap.get(DcMotor.class, "ARM");
-        intakeServo = hardwareMap.get(Servo.class, "INTAKE");
 
-        wristServo = hardwareMap.get(Servo.class, "WRIST");
-        wristServo.setPosition(0.64);
-        
-        holdUpSlideServo = hardwareMap.get(Servo.class,"LOCK");
-        //holdUpSlideServo.setPosition(holdUpLocked);
-
-        slideSensor = hardwareMap.get(DigitalChannel.class,"MAGNET");
-        slideSensor.setMode(DigitalChannel.Mode.INPUT);
-
-        uprightSensor = hardwareMap.get(DigitalChannel.class,"UPRIGHT");
-        uprightSensor.setMode(DigitalChannel.Mode.INPUT);
-        */
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-/*
-        slideMotor.setDirection(DcMotor.Direction.FORWARD);
-        armMotor.setDirection(DcMotor.Direction.FORWARD);
 
-        //setting up the shoulder motor 
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armMinPosition = armMotor.getCurrentPosition();
-        armMaxPosition = armMinPosition + armMaxOffset;
-        //change armMaxPosition ofset
-        telemetry.addData("armMinPosition:", "%d", armMinPosition);
-        telemetry.addData("armMaxPosition:", "%d", armMaxPosition);
-        //setting up slide motor
-        slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //slideMinPosition = slideMotor.getCurrentPosition();
-        //slideMaxPosition = slideMinPosition + slideMaxOffset;
-        
-        //Stopping arm from turn on gravity 
-        slideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slideMotor.setPower(0);
-        */
-        // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
     }
 
@@ -244,31 +131,12 @@ public class BaseTeleOpMode extends OpMode {
         final double fasterPowerScale = 0.75;//Fast speed
         final double slowerPowerScale = 0.25; //when left bumper is held
         double cPowerScale = gamepad1.right_bumper ? slowerPowerScale : gamepad1.left_bumper ? fasterPowerScale : powerScale;
-        
-        // // Check for demo mode driving
-        // boolean isArmUpright = !uprightSensor.getState();                
-        // if (isArmUpright || isDemoModeActive)
-        // {
-        //     isDemoModeActive = true;
-        //     cPowerScale = 0.30;
-        // }
-          
-        return cPowerScale; 
-        
+
+        return cPowerScale;
     }
     
     @Override
     public void loop() {
-        /*
-        //ake
-        if (gamepad2.dpad_up) {
-            intakeMotor.setPower(1.0);
-        } else if (gamepad2.dpad_down) {
-            intakeMotor.setPower(-1.0);
-        } else {
-            intakeMotor.setPower(0.0);
-        }
-        */
 
         final double width = 0.3;
         final double length = 0.32;
