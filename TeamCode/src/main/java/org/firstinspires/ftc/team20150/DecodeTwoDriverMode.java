@@ -11,6 +11,7 @@ public class DecodeTwoDriverMode extends BaseTeleOpMode {
     @Override
     public void init(){
         super.init();
+        shooter = new Shooter();
         shooter.init(hardwareMap,telemetry);
         telemetry.addData(robotCaption,"Happy");
     }
