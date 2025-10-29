@@ -22,7 +22,7 @@ public class Shooter {
 
     private Telemetry telemetry;
 
-    public void init(HardwareMap hardwareMap, Telemetry telemetry){
+    public Shooter(HardwareMap hardwareMap, Telemetry telemetry){
         // setup telemetry for logging.
         this.telemetry = telemetry;
         flywheelSpeed = 0.0;
