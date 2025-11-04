@@ -195,12 +195,12 @@ public class BaseTeleOpMode extends OpMode {
         final double leftSteeringDeg = Math.toDegrees(wheelRads[0]);
         final double rightSteeringDeg = Math.toDegrees(wheelRads[1]);
 
-        telemetry.addData("Steering", "%4.2f/%4.2f/%4.2f", steeringDeg, leftSteeringDeg, rightSteeringDeg);
-        telemetry.addData("Wheel Scale", "%4.2f/%4.2f", leftWheelScale, rightWheelScale);
-        telemetry.addData("Axial Speeds FL/FR/BL/BR", "%4.2f/%4.2f/%4.2f/%4.2f", axialSpeeds[0], axialSpeeds[1],
-            axialSpeeds[2], axialSpeeds[3]);
-
-        telemetry.update();
+//        telemetry.addData("Steering", "%4.2f/%4.2f/%4.2f", steeringDeg, leftSteeringDeg, rightSteeringDeg);
+//        telemetry.addData("Wheel Scale", "%4.2f/%4.2f", leftWheelScale, rightWheelScale);
+//        telemetry.addData("Axial Speeds FL/FR/BL/BR", "%4.2f/%4.2f/%4.2f/%4.2f", axialSpeeds[0], axialSpeeds[1],
+//            axialSpeeds[2], axialSpeeds[3]);
+//
+//        telemetry.update();
     }
 
     /*

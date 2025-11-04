@@ -31,31 +31,8 @@ public class BaseAutoOpMode extends LinearOpMode {
     protected DcMotor leftBackDrive = null;
     protected DcMotor rightFrontDrive = null;
     protected DcMotor rightBackDrive = null;
-    
-    protected Servo wristServo = null;
-    protected Servo intakeServo = null;
-    protected DcMotor armMotor = null;
-    protected DcMotor slideMotor = null;
-    
-    protected Servo holdUpSlideServo = null;
-    protected double holdUpLocked = 0.5;
-    protected double holdUpUnlocked = 0.2;
 
-    protected DigitalChannel slideSensor = null;
 
-    // arm limits
-    protected int armMinPosition = 0;  //reset on init
-    protected int armMaxPosition = 0;  //reset on init to min + armMaxOffset
-    protected int armTargetPosition = 0;
-    //slide limits
-    protected int slideMinPosition = 0;  //reset on init
-    protected int slideMaxPosition = 0;  //reset on init to min + slideMaxOffset
-    protected int slideTargetPosition = 0;
-    //Maxium offsets
-    protected int armMaxOffset = 800;
-    protected int slideMaxOffset = 500;
-
-    VisionPortal portal;
 
     protected ElapsedTime runtime = new ElapsedTime();
     
@@ -77,18 +54,7 @@ public class BaseAutoOpMode extends LinearOpMode {
         leftBackDrive = hardwareMap.get(DcMotor.class, "BL");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "FR");
         rightBackDrive = hardwareMap.get(DcMotor.class, "BR");
-        
 
-        slideMotor = hardwareMap.get(DcMotor.class, "SLIDE");
-        armMotor = hardwareMap.get(DcMotor.class, "ARM");
-        intakeServo = hardwareMap.get(Servo.class, "INTAKE");
-        wristServo = hardwareMap.get(Servo.class, "WRIST");
-        
-        holdUpSlideServo = hardwareMap.get(Servo.class,"LOCK");
-        //holdUpSlideServo.setPosition(holdUpLocked);
-
-        slideSensor = hardwareMap.get(DigitalChannel.class,"MAGNET");
-        slideSensor.setMode(DigitalChannel.Mode.INPUT);
         
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -104,116 +70,8 @@ public class BaseAutoOpMode extends LinearOpMode {
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+}
 
-
-        // Copied from BaseTeleOpMode
-        slideMotor.setDirection(DcMotor.Direction.FORWARD);
-        armMotor.setDirection(DcMotor.Direction.FORWARD);
-        
-        //setting up the shoulder motor 
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armMinPosition = armMotor.getCurrentPosition();
-        armMaxPosition = armMinPosition + armMaxOffset;
-        //change armMaxPosition ofset
-        telemetry.addData("armMinPosition:", "%d", armMinPosition);
-        telemetry.addData("armMaxPosition:", "%d", armMaxPosition);
-        //setting up slide motor
-        slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slideMinPosition = slideMotor.getCurrentPosition();
-        slideMaxPosition = slideMinPosition + slideMaxOffset;
-        wristServo.setPosition(0.64);
-        slideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slideMotor.setPower(0);
-        
-        
-        //change armMaxPosition ofset
-        
-        
-
-        // capture "before randomization" photo here
-       /* portal = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "WEBCAM"))
-                .setCameraResolution(new Size(RESOLUTION_WIDTH, RESOLUTION_HEIGHT))
-                .build();
-
-        // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData(
-                "Starting at", "%7d %7d %7d %7d",
-                leftFrontDrive.getCurrentPosition(),
-                rightFrontDrive.getCurrentPosition(),
-                leftBackDrive.getCurrentPosition(),
-                rightBackDrive.getCurrentPosition());
-        telemetry.update();
-    */}
-
-    /*public int findSpikeLocation() {
-       String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String beforePath = String.format("%s/VisionPortal-PhotoBeforeRandomization.png", dirPath);
-        String afterPath = String.format("%s/VisionPortal-PhotoAfterRandomization.png", dirPath);
-
-        Mat imgBefore = Imgcodecs.imread(beforePath);
-        Mat imgAfter = Imgcodecs.imread(afterPath);
-        telemetry.addData("imgBefore:", "%d x %d", imgBefore.cols(), imgBefore.rows());
-        telemetry.addData("imgAfter:", "%d x %d", imgAfter.cols(), imgAfter.rows());
-        telemetry.update();
-
-        // find difference between before and after images
-        Mat imgDiff = imgBefore.clone();
-        Core.absdiff(imgBefore, imgAfter, imgDiff);
-
-        // convert to black and white threshold image
-        final byte[] whitePixel = {(byte)255, (byte)255, (byte)255};
-        final byte[] blackPixel = {(byte)0, (byte)0, (byte)0};
-
-        final int imgWidth = imgDiff.width();
-        final int imgHeight = imgDiff.height();
-        
-        int halfImgWidth = imgBefore.cols() / 2;
-        int halfImgHeight = imgBefore.rows() / 2;
-
-        Mat imgThreshold = imgDiff.clone();
-        for (int x = 0; x < imgWidth; x++) {
-            for (int y = 0; y < imgHeight; y++) {
-                byte[] cPixel = new byte[3];
-                imgThreshold.get(y, x, cPixel);
-                        
-                imgThreshold.put(y, x, (int)(cPixel[0] + cPixel[1] + cPixel[2]) / 3 >= 30 ? whitePixel : blackPixel);
-            }
-        }
-
-        // Create images of top-left region of full image
-        Mat topLeft = imgThreshold.submat(0, halfImgHeight, 0, halfImgWidth);
-        Mat topRight = imgThreshold.submat(0, halfImgHeight, halfImgWidth, imgWidth);
-
-        // see if the top left corner changed
-        double topLeftPixelCount = 0.0;
-        for (int x = 0; x < halfImgWidth; x++) {
-            for (int y = 0; y < halfImgHeight; y++) {
-                byte[] cPixel = new byte[3];
-                topLeft.get(y, x, cPixel);
-                if (cPixel[0] == (byte)255) {
-                    topLeftPixelCount++;
-                }
-            }
-        }
-        double topLeftPercentage = topLeftPixelCount / (halfImgWidth * halfImgHeight);
-        boolean topLeftChanged = topLeftPercentage >= 0.1;
-                
-        // see if the top left corner changed
-        double topRightPixelCount = 0.0;
-        for (int x = 0; x < halfImgWidth; x++) {
-            for (int y = 0; y < halfImgHeight; y++) {
-                byte[] cPixel = new byte[3];
-                topRight.get(y, x, cPixel);
-                if (cPixel[0] == (byte)255) {
-                    topRightPixelCount++;
-                }
-            }
-        }
-       
-        
-    }
-    */
 
     public void encoderDrive(
             double speed,
