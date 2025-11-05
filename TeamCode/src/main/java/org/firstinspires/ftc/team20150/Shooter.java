@@ -1,103 +1,202 @@
 package org.firstinspires.ftc.team20150;
 
+import static java.lang.Thread.sleep;
+
+import android.annotation.SuppressLint;
+
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Shooter {
+    enum SpeedMode {
+        FLEX(3, "FLEX", -1),
+        DUNK(4, "Dunk mode", 0.45),
+        FREETHROW(5, "Free throw mode", 0.56),
+        THREEPOINTER(6, "Three pointer mode", 0.63);
+        private int mode;
+        private String name;
+        private double speed;
+        private SpeedMode(int mode, String name, double speed){
+            this.mode = mode;
+            this.name = name;
+            this.speed = speed;
+        }
+    }
     private final String flywheelCaption = "Shooter.Flywheel";
     private final String gatekeeperCaption = "Shooter.Gatekeeper";
-    private DcMotor flyWheel;
-    private Servo gateKeeper;
-    private double flywheelSpeed;
+    private final DcMotor flyWheel;
+    private final Servo gateKeeper;
+    private final Telemetry telemetry;
 
-    private final double speedIncrement = 0.1;
-    private final double maxSpeed = 0.8;
-    private final double minSpeed = 0.1;
+    private double currentSpeed;
+    private double newSpeed;
 
-
-    private Telemetry telemetry;
+    private final double speedIncrement = 0.01;
+    private SpeedMode currentMode;
+    private boolean isGateOpened = false;
 
     public Shooter(HardwareMap hardwareMap, Telemetry telemetry){
-        // setup telemetry for logging.
         this.telemetry = telemetry;
-        flywheelSpeed = 0.0;
+        newSpeed = 0.0;
+        currentSpeed = 0.0;
+        currentMode = SpeedMode.FLEX;
         // setup hardware
         flyWheel = hardwareMap.get(DcMotor.class, "FLYWHEEL");
-        //TODO Check direction
         flyWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         flyWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         flyWheel.setDirection(DcMotor.Direction.FORWARD);
-        flyWheel.setPower(flywheelSpeed);
+        flyWheel.setPower(currentSpeed);
         telemetry.addData(flywheelCaption, "Happy");
 
         gateKeeper = hardwareMap.get(Servo.class,"GATEKEEPER");
-        //TODO check direction and position
         gateKeeper.setDirection(Servo.Direction.FORWARD);
-        gateKeeper.setPosition(0.0);
-      //  gateKeeper.scaleRange(0.0,0.5);
+        closeGatekeeper();
+
         telemetry.addData(gatekeeperCaption, "Happy");
     }
 
+    private void update(){
+
+        if(currentMode == SpeedMode.FLEX){
+            currentSpeed = newSpeed;
+        }else{
+            currentSpeed = currentMode.speed;
+        }
+        flyWheel.setPower(currentSpeed);
+    }
     /**
      * Sets the shooter's flywheel speed
      * @param speed - speed
      */
-    public void setFlywheelSpeed(double speed){
-        flywheelSpeed = speed;
-        flyWheel.setPower(flywheelSpeed);
-        telemetry.addData(flywheelCaption,"Speed:%4.2f", flywheelSpeed);
+    public void setCurrentSpeed(double speed){
+        newSpeed = clampFlywheelSpeed(speed);
+        currentMode = SpeedMode.FLEX;
+        update();
     }
-
     /**
      * Increases flywheel speed by specific increment.
      */
     public void increaseFlywheelSpeed(){
-        flywheelSpeed += speedIncrement;
-        if(flywheelSpeed > maxSpeed)
-            flywheelSpeed = maxSpeed;
-        flyWheel.setPower(flywheelSpeed);
-        telemetry.addData(flywheelCaption,"Speed:%4.2f", flywheelSpeed);
-    }
+        newSpeed = clampFlywheelSpeed(currentSpeed + speedIncrement);
+        currentMode = SpeedMode.FLEX;
+        update();
 
+    }
     /**
      * Decreases flywheel speed by specific increment.
      */
     public void decreaseFlywheelSpeed(){
-        flywheelSpeed -= speedIncrement;
-        if(flywheelSpeed < minSpeed)
-            flywheelSpeed = minSpeed;
-        flyWheel.setPower(flywheelSpeed);
-        telemetry.addData(flywheelCaption,"Speed:%4.2f", flywheelSpeed);
+        newSpeed = clampFlywheelSpeed(currentSpeed - speedIncrement);
+        currentMode = SpeedMode.FLEX;
+        update();
+    }
+
+
+    public void nextFlywheelMode(){
+        switch (currentMode){
+            case DUNK:
+                currentMode = SpeedMode.FREETHROW;
+                break;
+            case FREETHROW:
+            case THREEPOINTER:
+                currentMode = SpeedMode.THREEPOINTER;
+                break;
+        }
+
+        if(currentMode == SpeedMode.FLEX){
+            if(currentSpeed <= SpeedMode.DUNK.speed){
+                currentMode = SpeedMode.DUNK;
+            }else if(currentSpeed <= SpeedMode.FREETHROW.speed){
+                currentMode = SpeedMode.FREETHROW;
+            }else if(currentSpeed <= SpeedMode.THREEPOINTER.speed){
+                currentMode = SpeedMode.THREEPOINTER;
+            }
+        }
+        telemetry.speak(currentMode.name);
+        update();
+    }
+    public void previousFlywheelMode(){
+        switch (currentMode){
+            case THREEPOINTER:
+                currentMode = SpeedMode.FREETHROW;
+                flyWheel.setPower(0);
+                break;
+            case FREETHROW:
+                currentMode = SpeedMode.DUNK;
+                flyWheel.setPower(0);
+                break;
+            case DUNK:
+                break;
+        }
+
+        if(currentMode == SpeedMode.FLEX){
+            if(currentSpeed > SpeedMode.THREEPOINTER.speed){
+                currentMode = SpeedMode.THREEPOINTER;
+                flyWheel.setPower(0);
+            }else if(currentSpeed > SpeedMode.FREETHROW.speed){
+                currentMode = SpeedMode.FREETHROW;
+                flyWheel.setPower(0);
+            }else if(currentSpeed > SpeedMode.DUNK.speed){
+                currentMode = SpeedMode.DUNK;
+                flyWheel.setPower(0);
+            }
+        }
+
+        try {
+            sleep(500);
+        } catch (InterruptedException ignored) {}
+
+        telemetry.speak(currentMode.name);
+    }
+
+    private double clampFlywheelSpeed(double speed){
+        if(speed > 0.8)
+            return 0.8;
+        if(speed < 0)
+            return 0;
+        return speed;
+    }
+
+    public void shootBall(){
+        openGatekeeper();
+        try {
+            sleep(300);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        closeGatekeeper();
     }
     /**
      * Opens gate to release the artifacts for shooting.
      */
-    public void openGatekeeper(){
-        //TODO check position
-        gateKeeper.setPosition(1.0);
-        telemetry.addData(gatekeeperCaption,"Opened");
+    private void openGatekeeper(){
+        gateKeeper.setPosition(0.3);
     }
 
     /**
      * Closes gate to store Artifacts
      */
-    public  void closeGatekeeper(){
-        //TODO check position
-        gateKeeper.setPosition(0.0);
-        telemetry.addData(gatekeeperCaption,"Closed");
+    private   void closeGatekeeper(){
+        gateKeeper.setPosition(1.0);
+    }
+
+    public void updateTelemetry(){
+        telemetry.addData(flywheelCaption+".Speed", currentSpeed);
+        telemetry.addData(flywheelCaption+".Mode", currentMode);
+        telemetry.addData(gatekeeperCaption, isGateOpened ? "Opened":"Closed");
     }
 
     /**
      * Stops the Shooter
      */
     public void stop(){
-        flywheelSpeed = 0.0;
-        flyWheel.setPower(flywheelSpeed);
-        telemetry.addData(flywheelCaption,"Stopped");
+        currentMode = SpeedMode.FLEX;
+        newSpeed = 0;
+        closeGatekeeper();
     }
 }
