@@ -22,7 +22,6 @@ public class DecodeTwoDriverMode extends BaseTeleOpMode {
     @Override
     public void start() {
         super.start();
-        shooter.closeGatekeeper();
         shooter.nextFlywheelMode();
         telemetry.speak("Started");
     }
@@ -38,12 +37,7 @@ public class DecodeTwoDriverMode extends BaseTeleOpMode {
 
         // Release artifact
         if(gamepad2.aWasPressed()){
-            shooter.openGatekeeper();
-            try {
-                sleep(300);
-            } catch (InterruptedException ignored) {}
-        }else{
-            shooter.closeGatekeeper();
+            shooter.shootBall();
         }
 
         if(gamepad2.right_bumper) {

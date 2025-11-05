@@ -16,20 +16,10 @@ public class DecodeGateAuto extends BaseAutoOpMode{
 
         driveForwardInches(1,-30,10);
 
-        sleep(4000);
-        shooter.openGatekeeper();
-        sleep(300);
-        shooter.closeGatekeeper();
-
-        sleep(3000);
-        shooter.openGatekeeper();
-        sleep(300);
-        shooter.closeGatekeeper();
-
-        sleep(3000);
-        shooter.openGatekeeper();
-        sleep(300);
-        shooter.closeGatekeeper();
+        for (int i = 0; i < 3; i++) {
+            sleep(4000);
+            shooter.shootBall();
+        }
 
         shooter.stop();
     }

@@ -55,8 +55,8 @@ public class Shooter {
 
         gateKeeper = hardwareMap.get(Servo.class,"GATEKEEPER");
         gateKeeper.setDirection(Servo.Direction.FORWARD);
-        gateKeeper.setPosition(1.0);
-      //  gateKeeper.scaleRange(0.0,0.5);
+        closeGatekeeper();
+
         telemetry.addData(gatekeeperCaption, "Happy");
     }
 
@@ -161,17 +161,27 @@ public class Shooter {
             return 0;
         return speed;
     }
+
+    public void shootBall(){
+        openGatekeeper();
+        try {
+            sleep(300);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        closeGatekeeper();
+    }
     /**
      * Opens gate to release the artifacts for shooting.
      */
-    public void openGatekeeper(){
+    private void openGatekeeper(){
         gateKeeper.setPosition(0.3);
     }
 
     /**
      * Closes gate to store Artifacts
      */
-    public  void closeGatekeeper(){
+    private   void closeGatekeeper(){
         gateKeeper.setPosition(1.0);
     }
 
