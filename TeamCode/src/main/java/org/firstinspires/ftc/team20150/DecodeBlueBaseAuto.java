@@ -22,7 +22,7 @@ public class DecodeBlueBaseAuto extends BaseAutoOpMode {
             sleep(4000);
             shooter.shootBall();
         }
-
+        strafeLeftInches(0.5,35,10);
         shooter.stop();
     }
 }

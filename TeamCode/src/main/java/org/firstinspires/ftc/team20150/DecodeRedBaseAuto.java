@@ -23,6 +23,7 @@ public class DecodeRedBaseAuto extends BaseAutoOpMode {
             sleep(4000);
             shooter.shootBall();
         }
+        strafeRightInches(0.5,35,10);
         shooter.stop();
     }
 }

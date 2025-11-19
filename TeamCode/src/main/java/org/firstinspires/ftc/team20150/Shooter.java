@@ -12,7 +12,17 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+/**
+ * Represents the shooter mechanism of the robot.
+ * This class controls the flywheel for shooting and the gatekeeper servo for releasing the ball.
+ * It includes different speed modes for various shooting distances.
+ */
 public class Shooter {
+    /**
+     * Defines the speed modes for the shooter's flywheel.
+     * Each mode has a predefined speed for different shooting scenarios like dunking or a three-pointer.
+     * FLEX mode allows for manual speed adjustments.
+     */
     enum SpeedMode {
         FLEX(3, "FLEX", -1),
         DUNK(4, "Dunk mode", 0.45),
@@ -21,6 +31,13 @@ public class Shooter {
         private int mode;
         private String name;
         private double speed;
+
+        /**
+         * Constructor for SpeedMode enum.
+         * @param mode The integer representation of the mode.
+         * @param name The descriptive name of the mode.
+         * @param speed The flywheel power for this mode.
+         */
         private SpeedMode(int mode, String name, double speed){
             this.mode = mode;
             this.name = name;
@@ -40,6 +57,11 @@ public class Shooter {
     private SpeedMode currentMode;
     private boolean isGateOpened = false;
 
+    /**
+     * Initializes the Shooter hardware and sets initial values.
+     * @param hardwareMap The hardware map from the robot's configuration.
+     * @param telemetry The telemetry object for displaying data on the driver station.
+     */
     public Shooter(HardwareMap hardwareMap, Telemetry telemetry){
         this.telemetry = telemetry;
         newSpeed = 0.0;
@@ -60,8 +82,10 @@ public class Shooter {
         telemetry.addData(gatekeeperCaption, "Happy");
     }
 
+    /**
+     * Updates the flywheel's power based on the current mode or manually set speed.
+     */
     private void update(){
-
         if(currentMode == SpeedMode.FLEX){
             currentSpeed = newSpeed;
         }else{
@@ -70,8 +94,8 @@ public class Shooter {
         flyWheel.setPower(currentSpeed);
     }
     /**
-     * Sets the shooter's flywheel speed
-     * @param speed - speed
+     * Sets the shooter's flywheel speed manually and switches to FLEX mode.
+     * @param speed The desired speed, which will be clamped between 0 and 0.8.
      */
     public void setCurrentSpeed(double speed){
         newSpeed = clampFlywheelSpeed(speed);
@@ -79,7 +103,7 @@ public class Shooter {
         update();
     }
     /**
-     * Increases flywheel speed by specific increment.
+     * Increases flywheel speed by a specific increment and switches to FLEX mode.
      */
     public void increaseFlywheelSpeed(){
         newSpeed = clampFlywheelSpeed(currentSpeed + speedIncrement);
@@ -88,7 +112,7 @@ public class Shooter {
 
     }
     /**
-     * Decreases flywheel speed by specific increment.
+     * Decreases flywheel speed by a specific increment and switches to FLEX mode.
      */
     public void decreaseFlywheelSpeed(){
         newSpeed = clampFlywheelSpeed(currentSpeed - speedIncrement);
@@ -97,6 +121,10 @@ public class Shooter {
     }
 
 
+    /**
+     * Cycles to the next more powerful flywheel speed mode.
+     * If in FLEX mode, it will select a mode based on the current speed.
+     */
     public void nextFlywheelMode(){
         switch (currentMode){
             case DUNK:
@@ -108,6 +136,7 @@ public class Shooter {
                 break;
         }
 
+        // Logic to switch from FLEX to a preset mode
         if(currentMode == SpeedMode.FLEX){
             if(currentSpeed <= SpeedMode.DUNK.speed){
                 currentMode = SpeedMode.DUNK;
@@ -120,6 +149,12 @@ public class Shooter {
         telemetry.speak(currentMode.name);
         update();
     }
+
+    /**
+     * Cycles to the next less powerful flywheel speed mode.
+     * If in FLEX mode, it will select a mode based on the current speed.
+     * Includes a delay after changing modes.
+     */
     public void previousFlywheelMode(){
         switch (currentMode){
             case THREEPOINTER:
@@ -134,6 +169,7 @@ public class Shooter {
                 break;
         }
 
+        // Logic to switch from FLEX to a preset mode
         if(currentMode == SpeedMode.FLEX){
             if(currentSpeed > SpeedMode.THREEPOINTER.speed){
                 currentMode = SpeedMode.THREEPOINTER;
@@ -148,12 +184,19 @@ public class Shooter {
         }
 
         try {
+            // Pause to allow the flywheel to spin down slightly
             sleep(500);
         } catch (InterruptedException ignored) {}
 
         telemetry.speak(currentMode.name);
+        update();
     }
 
+    /**
+     * Clamps the flywheel speed to a safe operating range.
+     * @param speed The speed to clamp.
+     * @return The clamped speed, between 0.0 and 0.8.
+     */
     private double clampFlywheelSpeed(double speed){
         if(speed > 0.8)
             return 0.8;
@@ -162,29 +205,37 @@ public class Shooter {
         return speed;
     }
 
+    /**
+     * Executes the shooting sequence: opens and then closes the gatekeeper.
+     */
     public void shootBall(){
         openGatekeeper();
         try {
-            sleep(300);
+            sleep(300); // Wait for the ball to pass through
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         closeGatekeeper();
     }
     /**
-     * Opens gate to release the artifacts for shooting.
+     * Opens the gatekeeper servo to release the artifacts for shooting.
      */
     private void openGatekeeper(){
         gateKeeper.setPosition(0.3);
+        isGateOpened = true;
     }
 
     /**
-     * Closes gate to store Artifacts
+     * Closes the gatekeeper servo to store or block artifacts.
      */
-    private   void closeGatekeeper(){
+    private void closeGatekeeper(){
         gateKeeper.setPosition(1.0);
+        isGateOpened = false;
     }
 
+    /**
+     * Updates telemetry data with the current state of the shooter.
+     */
     public void updateTelemetry(){
         telemetry.addData(flywheelCaption+".Speed", currentSpeed);
         telemetry.addData(flywheelCaption+".Mode", currentMode);
@@ -192,11 +243,12 @@ public class Shooter {
     }
 
     /**
-     * Stops the Shooter
+     * Stops the shooter mechanism and resets its state.
      */
     public void stop(){
         currentMode = SpeedMode.FLEX;
         newSpeed = 0;
+        update(); // Sets flywheel power to 0
         closeGatekeeper();
     }
 }
