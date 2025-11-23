@@ -26,7 +26,7 @@ public class Shooter {
     enum SpeedMode {
         FLEX(3, "FLEX", -1),
         DUNK(4, "Dunk mode", 0.45),
-        FREETHROW(5, "Free throw mode", 0.56),
+        FREETHROW(5, "Free throw mode", 0.55),
         THREEPOINTER(6, "Three pointer mode", 0.63);
         private int mode;
         private String name;

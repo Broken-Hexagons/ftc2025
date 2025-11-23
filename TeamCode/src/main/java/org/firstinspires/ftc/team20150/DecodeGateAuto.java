@@ -32,10 +32,10 @@ public abstract class DecodeGateAuto extends BaseAutoOpMode {
         waitForStart();
 
         // Set the shooter flywheel to a predefined speed (0.56, likely for free throws).
-        shooter.setCurrentSpeed(0.56);
+        shooter.setCurrentSpeed(0.47);
 
         // Drive backward 56.5 inches to position the robot for shooting.
-        driveForwardInches(0.5, -56.5, 10); // 10-second timeout
+        driveForwardInches(0.5, -30, 10); // 10-second timeout
 
         // Loop to shoot three balls.
         for (int i = 0; i < 3; i++) {

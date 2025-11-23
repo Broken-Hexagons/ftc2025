@@ -3,26 +3,22 @@ package org.firstinspires.ftc.team20150;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(name = "Decode Blue Base Auto", group = "Robot")
-public class DecodeBlueBaseAuto extends BaseAutoOpMode {
+public class DecodeBlueBaseAuto extends DecodeBaseAuto {
 
     private Shooter shooter;
 
     @Override
-    public void runOpMode() {
-        super.runOpMode();
-        shooter = new Shooter(hardwareMap,telemetry);
+    protected void leave(double speed, double distance) {
+        strafeLeftInches(speed,distance,10);
+    }
 
-        waitForStart();
-        shooter.setCurrentSpeed(0.5);
+    @Override
+    protected void firstMove(double speed, double distance) {
+        strafeLeftInches(speed,distance,4);
+    }
 
-        driveForwardInches(1, 40, 10);
-        turnLeftDegrees(0.5,45,3);
-
-        for (int i = 0; i < 3; i++) {
-            sleep(4000);
-            shooter.shootBall();
-        }
-        strafeLeftInches(0.5,35,10);
-        shooter.stop();
+    @Override
+    protected void turn(double speed, double degrees) {
+        turnLeftDegrees(speed,degrees,3);
     }
 }
