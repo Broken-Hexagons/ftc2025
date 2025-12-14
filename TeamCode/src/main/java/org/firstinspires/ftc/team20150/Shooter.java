@@ -26,7 +26,7 @@ public class Shooter {
     enum SpeedMode {
         FLEX(3, "FLEX", -1),
         DUNK(4, "Dunk mode", 0.45),
-        FREETHROW(5, "Free throw mode", 0.55),
+        FREETHROW(5, "Free throw mode", 0.53),
         THREEPOINTER(6, "Three pointer mode", 0.63);
         private int mode;
         private String name;
@@ -211,7 +211,7 @@ public class Shooter {
     public void shootBall(){
         openGatekeeper();
         try {
-            sleep(300); // Wait for the ball to pass through
+            sleep(320); // Wait for the ball to pass through
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
