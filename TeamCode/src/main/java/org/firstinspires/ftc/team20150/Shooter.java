@@ -76,7 +76,7 @@ public class Shooter {
         telemetry.addData(flywheelCaption, "Happy");
 
         gateKeeper = hardwareMap.get(Servo.class,"GATEKEEPER");
-        gateKeeper.setDirection(Servo.Direction.FORWARD);
+        gateKeeper.setDirection(Servo.Direction.REVERSE);
         closeGatekeeper();
 
         telemetry.addData(gatekeeperCaption, "Happy");
@@ -221,7 +221,7 @@ public class Shooter {
      * Opens the gatekeeper servo to release the artifacts for shooting.
      */
     private void openGatekeeper(){
-        gateKeeper.setPosition(0.3);
+        gateKeeper.setPosition(-0.3);
         isGateOpened = true;
     }
 
@@ -229,7 +229,7 @@ public class Shooter {
      * Closes the gatekeeper servo to store or block artifacts.
      */
     private void closeGatekeeper(){
-        gateKeeper.setPosition(1.0);
+        gateKeeper.setPosition(0.35);
         isGateOpened = false;
     }
 
