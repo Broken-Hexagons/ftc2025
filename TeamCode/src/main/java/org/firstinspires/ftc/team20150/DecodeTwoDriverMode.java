@@ -31,7 +31,7 @@ public class DecodeTwoDriverMode extends BaseTeleOpMode {
         super.loop();
 
         //Emergency stop
-        if(gamepad2.xWasPressed() || gamepad1.xWasPressed()){
+        if(gamepad1.xWasPressed()){
             shooter.stop();
         }
 

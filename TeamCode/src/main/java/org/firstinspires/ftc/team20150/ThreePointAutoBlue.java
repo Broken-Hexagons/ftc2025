@@ -2,8 +2,8 @@ package org.firstinspires.ftc.team20150;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "Decode Red 3 point", group = "Robot")
-public class ThreePointAutoRed extends BaseAutoOpMode {
+@Autonomous(name = "Decode Blue 3 point", group = "Robot")
+public class ThreePointAutoBlue extends BaseAutoOpMode {
     private Shooter shooter;
 
 
@@ -17,9 +17,9 @@ public class ThreePointAutoRed extends BaseAutoOpMode {
         shooter.setCurrentSpeed(0.58);
 
 
-        strafeRightInches(0.1,1,3);
+        strafeLeftInches(0.1,1,3);
         driveForwardInches(0.3,3,4);
-        turnRightDegrees(0.3,25,2);
+        turnRightDegrees(0.3,-25,2);
 
 
         for (int i = 0; i < 3; i++) {
