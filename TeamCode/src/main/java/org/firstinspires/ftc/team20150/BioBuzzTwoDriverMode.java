@@ -3,18 +3,19 @@ package org.firstinspires.ftc.team20150;
 import static java.lang.Thread.sleep;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
-@TeleOp(name = "Decode 2 Driver TeleOp")
-public class DecodeTwoDriverMode extends BaseTeleOpMode {
+@TeleOp(name = "BioBuzz 2 Driver TeleOp")
+public class BioBuzzTwoDriverMode extends BaseTeleOpMode {
 
     private final String robotCaption = "Robot";
     private Shooter shooter;
+    private Intake intake;
 
     @Override
     public void init(){
         super.init();
         shooter = new Shooter(hardwareMap,telemetry);
+        intake = new Intake(hardwareMap, telemetry);
         telemetry.addData(robotCaption,"Happy");
         telemetry.speak("Initialized");
     }
@@ -23,6 +24,7 @@ public class DecodeTwoDriverMode extends BaseTeleOpMode {
     public void start() {
         super.start();
         shooter.nextFlywheelMode();
+        intake.run();
         telemetry.speak("Started");
     }
 
@@ -38,6 +40,12 @@ public class DecodeTwoDriverMode extends BaseTeleOpMode {
         // Release artifact
         if(gamepad2.aWasPressed()){
             shooter.shootBall();
+        }
+        if(gamepad2.yWasPressed()){
+            intake.reverse();
+            if(gamepad2.yWasReleased()){
+                intake.run();
+            }
         }
 
         if(gamepad2.right_bumper) {
@@ -65,6 +73,7 @@ public class DecodeTwoDriverMode extends BaseTeleOpMode {
     public void stop() {
         super.stop();
         shooter.stop();
+        intake.stop();
         telemetry.addData(robotCaption, "Stopped.");
     }
 }
