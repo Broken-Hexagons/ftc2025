@@ -43,9 +43,10 @@ public class BioBuzzTwoDriverMode extends BaseTeleOpMode {
         }
         if(gamepad2.yWasPressed()){
             intake.reverse();
-            if(gamepad2.yWasReleased()){
-                intake.run();
-            }
+
+
+        }if(gamepad2.yWasReleased()){
+            intake.run();
         }
 
         if(gamepad2.right_bumper) {
