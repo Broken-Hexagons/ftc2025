@@ -31,7 +31,7 @@ android {
                 keyPassword System.getenv("APK_SIGNING_KEY_PASSWORD")
                 storeFile file(System.getenv("APK_SIGNING_STORE_FILE"))
                 storePassword System.getenv("APK_SIGNING_STORE_PASSWORD")
-            } else {
+            } else if (rootProject.file('libs/ftc.debug.keystore').exists()) {
                 keyAlias 'androiddebugkey'
                 keyPassword 'android'
                 storeFile rootProject.file('libs/ftc.debug.keystore')
@@ -40,10 +40,12 @@ android {
         }
 
         debug {
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-            storeFile rootProject.file('libs/ftc.debug.keystore')
-            storePassword 'android'
+            if (rootProject.file('libs/ftc.debug.keystore').exists()) {
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+                storeFile rootProject.file('libs/ftc.debug.keystore')
+                storePassword 'android'
+            }
         }
     }
 
