@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -47,7 +48,7 @@ public class Shooter {
     private final String flywheelCaption = "Shooter.Flywheel";
     private final String gatekeeperCaption = "Shooter.Gatekeeper";
     private final DcMotor flyWheel;
-    private final Servo gateKeeper;
+    private final DcMotor gateKeeper;
     private final Telemetry telemetry;
 
     private double currentSpeed;
@@ -75,8 +76,8 @@ public class Shooter {
         flyWheel.setPower(currentSpeed);
         telemetry.addData(flywheelCaption, "Happy");
 
-        gateKeeper = hardwareMap.get(Servo.class,"GATEKEEPER");
-        gateKeeper.setDirection(Servo.Direction.REVERSE);
+        gateKeeper = hardwareMap.get(DcMotor.class,"GATEKEEPER");
+        gateKeeper.setDirection(DcMotor.Direction.REVERSE);
         closeGatekeeper();
 
         telemetry.addData(gatekeeperCaption, "Happy");
@@ -221,7 +222,7 @@ public class Shooter {
      * Opens the gatekeeper servo to release the artifacts for shooting.
      */
     private void openGatekeeper(){
-        gateKeeper.setPosition(-0.3);
+       gateKeeper.setDirection(DcMotorSimple.Direction.REVERSE);
         isGateOpened = true;
     }
 
@@ -229,7 +230,7 @@ public class Shooter {
      * Closes the gatekeeper servo to store or block artifacts.
      */
     private void closeGatekeeper(){
-        gateKeeper.setPosition(0.35);
+        gateKeeper.setPower(0.0);
         isGateOpened = false;
     }
 
