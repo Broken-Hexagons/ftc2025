@@ -37,10 +37,15 @@ public class BioBuzzTwoDriverMode extends BaseTeleOpMode {
             shooter.stop();
         }
 
-        // Release artifact
+        // Release pollen
         if(gamepad2.aWasPressed()){
-            shooter.shootBall();
+            shooter.openGatekeeper();
         }
+        if(gamepad2.aWasReleased()){
+            shooter.closeGatekeeper();
+        }
+
+        //intake control
         if(gamepad2.yWasPressed()){
             intake.reverse();
 
