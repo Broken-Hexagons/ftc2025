@@ -56,7 +56,7 @@ public class Shooter {
 
     private final double speedIncrement = 0.01;
     private SpeedMode currentMode;
-    private boolean isGateOpened = false;
+
 
     /**
      * Initializes the Shooter hardware and sets initial values.
@@ -207,21 +207,9 @@ public class Shooter {
     }
 
     /**
-     * Executes the shooting sequence: opens and then closes the gatekeeper.
-     */
-    public void shootBall(){
-        openGatekeeper();
-        try {
-            sleep(320); // Wait for the ball to pass through
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        closeGatekeeper();
-    }
-    /**
      * Opens the gatekeeper servo to release the artifacts for shooting.
      */
-    private void openGatekeeper(){
+    public void openGatekeeper(){
        gateKeeper.setPower(0.7);
 
     }
@@ -229,7 +217,7 @@ public class Shooter {
     /**
      * Closes the gatekeeper servo to store or block artifacts.
      */
-    private void closeGatekeeper(){
+    public void closeGatekeeper(){
         gateKeeper.setPower(0.0);
 
     }
@@ -240,7 +228,6 @@ public class Shooter {
     public void updateTelemetry(){
         telemetry.addData(flywheelCaption+".Speed", currentSpeed);
         telemetry.addData(flywheelCaption+".Mode", currentMode);
-        telemetry.addData(gatekeeperCaption, isGateOpened ? "Opened":"Closed");
     }
 
     /**
