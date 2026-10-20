@@ -222,8 +222,8 @@ public class Shooter {
      * Opens the gatekeeper servo to release the artifacts for shooting.
      */
     private void openGatekeeper(){
-       gateKeeper.setDirection(DcMotorSimple.Direction.REVERSE);
-        isGateOpened = true;
+       gateKeeper.setPower(0.7);
+
     }
 
     /**
@@ -231,7 +231,7 @@ public class Shooter {
      */
     private void closeGatekeeper(){
         gateKeeper.setPower(0.0);
-        isGateOpened = false;
+
     }
 
     /**
