@@ -27,7 +27,7 @@ The `TeamCode` module contains custom autonomous and teleoperated OpModes, subsy
 - **TeleOp Drivetrain Base (`BaseTeleOpMode.java`)**:
   - 4-wheel drive system mapped to Gamepad 1.
   - Trigonometric angle snapping, magnitude processing, and differential wheel power scaling.
-  - Speed toggling via bumpers: **Standard (50%)**, **Fast (75%)**, and **Slow (25%)**.
+  - Hold Gamepad 1's **left bumper** for **Fast (75%)** or **right bumper** for **Slow (25%)**; releasing both restores **Standard (50%)**. Slow takes priority if both are held.
 - **Autonomous Drive Base (`BaseAutoOpMode.java`)**:
   - Encoder-calculated movement functions: `driveForwardInches`, `strafeLeftInches`, `strafeRightInches`, and `turnLeftDegrees`/`turnRightDegrees`.
   - Closed-loop motor control (`RUN_TO_POSITION`).
